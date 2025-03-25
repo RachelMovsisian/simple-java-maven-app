@@ -35,8 +35,9 @@ jobs:
 
       - name: Create new Git tag
         run: |
-          git tag ${{ steps.version.outputs.version }}
-          git push origin ${{ steps.version.outputs.version }}
+          VERSION=${{ steps.version.outputs.version }}
+          git tag $VERSION
+          git push origin $VERSION
 
       - name: Build JAR
         run: mvn clean package -Drevision=${{ steps.version.outputs.version }}
@@ -46,4 +47,3 @@ jobs:
         with:
           name: my-jar
           path: target/*.jar
-```
