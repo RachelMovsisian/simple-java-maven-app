@@ -39,6 +39,11 @@ jobs:
           git tag $VERSION
           git push origin $VERSION
 
+      - name: Create GitHub Release
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          gh release create $VERSION target/*.jar --title "Release $VERSION" --notes "Release notes for version $VERSION"
+
       - name: Build JAR
         run: mvn clean package -Drevision=${{ steps.version.outputs.version }}
 
