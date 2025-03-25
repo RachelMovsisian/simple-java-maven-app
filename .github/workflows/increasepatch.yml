@@ -16,15 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get latest tag
-        id: get_tag
-        run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
-          if [[ "$LATEST_TAG" == "0.0.0" ]]; then
-            LATEST_TAG="1.0.0"
-          fi
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-
       - name: Get next version
         uses: reecetech/version-increment@2024.10.1
         id: version
@@ -45,11 +36,3 @@ jobs:
           VERSION=${{ steps.version.outputs.version }}
           gh release create $VERSION target/*.jar --title "Release $VERSION" --notes "Release notes for version $VERSION"
 
-      - name: Build JAR
-        run: mvn clean package -Drevision=${{ steps.version.outputs.version }}
-
-      - name: Upload JAR as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-jar
-          path: target/*.jar
