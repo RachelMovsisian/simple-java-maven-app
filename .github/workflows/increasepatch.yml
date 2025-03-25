@@ -31,7 +31,6 @@ jobs:
         with:
           scheme: semver
           increment: patch
-          version: ${{ env.LATEST_TAG }}
 
       - name: Create new Git tag
         run: |
