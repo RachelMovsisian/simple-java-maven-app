@@ -39,6 +39,8 @@ jobs:
           git push origin $VERSION
 
       - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=${{ steps.version.outputs.version }}
           gh release create $VERSION target/*.jar --title "Release $VERSION" --notes "Release notes for version $VERSION"
