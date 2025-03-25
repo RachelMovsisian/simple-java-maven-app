@@ -48,4 +48,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/my-app:${{ steps.version.outputs.version }}
+          tags: ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
