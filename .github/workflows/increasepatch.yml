@@ -1,0 +1,43 @@
+name: Auto-Increment Patch Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Get next version
+        uses: reecetech/version-increment@2024.10.1
+        id: version
+        with:
+          scheme: semver
+          increment: patch
+          version: ${{ env.LATEST_TAG }}
+
+      - name: Create new Git tag
+        run: |
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
+
+      - name: Build JAR
+        run: mvn clean package -Drevision=${{ steps.version.outputs.version }}
+
+      - name: Upload JAR as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-jar
+          path: target/*.jar
