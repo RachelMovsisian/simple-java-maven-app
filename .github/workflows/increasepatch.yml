@@ -21,7 +21,6 @@ jobs:
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-
       - name: Get next version
         uses: reecetech/version-increment@2024.10.1
         id: version
@@ -34,7 +33,6 @@ jobs:
         run: |
           git tag ${{ steps.version.outputs.version }}
           git push origin ${{ steps.version.outputs.version }}
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -59,16 +57,12 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
       - name: Deploy to EC2
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > github-ec2.pem
-          chmod 600 github-ec2.pem
-          ssh -o StrictHostKeyChecking=no -i github-ec2.pem ubuntu@13.53.127.211 << EOF
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.version }}
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@56.228.4.169 << EOF
+            echo $GITHUB_TOKEN | docker login ghcr.io -u rachelmovsisian --password-stdin
+            docker pull ghcr.io/rachelmovsisian/my-app:1.0.13
             docker stop my-app || true
             docker rm my-app || true
-            docker run -d --name my-app -p 80:8080 ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.version }}
+            docker run -d --name my-app -p 80:8080 ghcr.io/rachelmovsisian/my-app
           EOF
-
