@@ -68,7 +68,7 @@ jobs:
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > github-ec2.pem
           chmod 600 github-ec2.pem
-          ssh -o StrictHostKeyChecking=no -i github-ec2.pem ubuntu@13.53.127.211 << EOF
+          ssh -o StrictHostKeyChecking=no -i github-ec2.pem ubuntu@56.228.4.169 << EOF
             docker login ghcr.io -u ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
             docker pull ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.version }}
             docker stop my-app || true
