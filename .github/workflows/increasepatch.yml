@@ -12,15 +12,15 @@ env:
 jobs:
   release:
     runs-on: ubuntu-latest
-
+    outputs:
+      output_tag: ${{ steps.get_tag.outputs.LATEST_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get latest tag
-        id: get_tag
+      - id: get_tag
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
@@ -59,6 +59,8 @@ jobs:
     needs: release
 
     steps:
+      - env:
+          OUTPUT: ${{needs.release.outputs.output_tag}}
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -68,5 +70,5 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@56.228.4.169 << EOF
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/rachelmovsisian/my-app:${{env.VER}}
+            docker pull ghcr.io/rachelmovsisian/my-app:${{OUTPUT}}
           EOF
