@@ -50,10 +50,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: release
-
     steps:
-      - run: echo "${{ outputs.version }}"
+      - run: echo "${{ release.outputs.version }}"
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -63,5 +61,5 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@56.228.4.169 << EOF
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/rachelmovsisian/my-app:${{ outputs.version }}
+            docker pull ghcr.io/rachelmovsisian/my-app:${{ release.outputs.version }}
           EOF
