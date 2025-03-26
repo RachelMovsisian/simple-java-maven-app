@@ -60,10 +60,6 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Add EC2 to known hosts
-        run: |
-          ssh-keyscan -H 13.53.127.211 >> ~/.ssh/known_hosts
-
       - name: Deploy to EC2
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > github-ec2.pem
