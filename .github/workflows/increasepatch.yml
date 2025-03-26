@@ -6,7 +6,7 @@ on:
       - master
   workflow_dispatch:
 env:
-  VER: tag
+  VER: "tag"
 
 jobs:
   release:
