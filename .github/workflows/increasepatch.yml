@@ -6,6 +6,9 @@ on:
       - master
   workflow_dispatch:
 
+env: 
+  VER: "tag"
+            
 jobs:
   release:
     runs-on: ubuntu-latest
