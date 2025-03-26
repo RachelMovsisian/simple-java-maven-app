@@ -5,8 +5,6 @@ on:
     branches:
       - master
   workflow_dispatch:
-env:
-  VER: "tag"
 
 jobs:
   release:
@@ -44,7 +42,8 @@ jobs:
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
-         VER= ${{ steps.version.outputs.version }}
+        env: 
+            VER: ${{ steps.version.outputs.version }}
         with:
           context: .
           push: true
