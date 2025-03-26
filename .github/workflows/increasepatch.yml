@@ -61,5 +61,5 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@56.228.4.169 << EOF
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.version }}
+            docker pull ghcr.io/rachelmovsisian/my-app
           EOF
