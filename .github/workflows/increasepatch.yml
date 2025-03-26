@@ -6,36 +6,42 @@ on:
       - master
   workflow_dispatch:
 
-env: 
-  VER: "tag"
-            
 jobs:
   release:
     runs-on: ubuntu-latest
     outputs:
-      output_tag: ${{ steps.get_tag.outputs.LATEST_TAG }}
+      output_tag: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - id: get_tag
+      - name: Get latest tag
+        id: get_tag
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_OUTPUT
+
       - name: Get next version
         uses: reecetech/version-increment@2024.10.1
         id: version
         with:
           scheme: semver
           increment: patch
-          version: ${{ env.LATEST_TAG }}
+          version: ${{ steps.get_tag.outputs.LATEST_TAG }}
+
+      - name: Configure Git User
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
 
       - name: Create new Git tag
         run: |
           git tag ${{ steps.version.outputs.version }}
-          git push origin ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }} --force
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -45,30 +51,26 @@ jobs:
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
-        env: 
-            VER: ${{ steps.version.outputs.version }}
         with:
           context: .
           push: true
-          tags: | 
+          tags: |
             ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
-        
+          build-args: VER=${{ steps.version.outputs.version }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: release
-
     steps:
-      - env:
-          OUTPUT: ${{needs.release.outputs.output_tag}}
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@56.228.4.169 << EOF
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/rachelmovsisian/my-app:${{OUTPUT}}
+            docker pull ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.output_tag }}
           EOF
