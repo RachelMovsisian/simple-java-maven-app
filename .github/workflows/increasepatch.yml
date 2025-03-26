@@ -44,11 +44,11 @@ jobs:
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
+         VER= ${{ steps.version.outputs.version }}
         with:
           context: .
           push: true
           tags: | 
-            VER= ${{ steps.version.outputs.version }}
             ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
         
 
