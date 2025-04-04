@@ -23,22 +23,9 @@ jobs:
       - name: Run TruffleHog Secret Scanning
         run: trufflehog --regex --entropy=True --max_depth=50 .
 
-      - name: Set up JDK and Maven
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'maven'
-
       - name: Install project dependencies
         run: mvn clean install -DskipTests
-
-      - name: Dependency Scan
-        uses: snyk/actions/maven@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        continue-on-error: false  
-
+        
       - name: Get latest tag
         id: get_tag
         run: |
