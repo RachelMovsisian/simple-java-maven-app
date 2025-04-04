@@ -70,7 +70,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@56.228.4.169 << EOF
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@16.16.28.232 << EOF
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker pull ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.output_tag }}
           EOF
