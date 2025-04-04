@@ -19,7 +19,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        if: ${{ hashFiles('pom.xml') != '' }}
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+      
       - name: Run TruffleHog Secret Scanning
         run: trufflehog --regex --entropy=True --max_depth=50 .
       
