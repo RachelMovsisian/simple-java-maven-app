@@ -13,8 +13,8 @@ jobs:
       output_tag: ${{ steps.version.outputs.version }}
     steps:
       - name: Install TruffleHog
-        run: pip install truffleHog
-        
+        run: pip install trufflehog
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -22,16 +22,19 @@ jobs:
 
       - name: Run TruffleHog Secret Scanning
         run: trufflehog --regex --entropy=True --max_depth=50 .
-      
+
       - name: Set up JDK and Maven
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'maven'
 
-      
+      - name: Install project dependencies
+        run: mvn clean install -DskipTests
+
       - name: Dependency Scan
-        uses: snyk/actions/node@master
+        uses: snyk/actions/maven@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         continue-on-error: false  
