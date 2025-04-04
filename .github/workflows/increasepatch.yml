@@ -27,10 +27,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: maven
-          
+      
       - name: OWASP Dependency Check
         if: ${{ hashFiles('pom.xml') != '' }}
         uses: dependency-check/Dependency-Check_Action@main
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
         with:
           project: 'My Project'
           path: '.'
@@ -39,7 +41,8 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableExperimental
-            --suppression suppress.xm
+            --suppression suppress.xml          
+
       - name: Run TruffleHog Secret Scanning
         run: trufflehog --regex --entropy=True --max_depth=50 .
       
