@@ -16,6 +16,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Secret Scanning
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          base: origin/main
+          head: HEAD
 
       - name: Get latest tag
         id: get_tag
@@ -57,20 +62,3 @@ jobs:
           tags: |
             ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
           build-args: VER=${{ steps.version.outputs.version }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: release
-    steps:
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Deploy to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@16.16.28.232 << EOF
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker pull ghcr.io/rachelmovsisian/my-app:${{ needs.release.outputs.output_tag }}
-          EOF
