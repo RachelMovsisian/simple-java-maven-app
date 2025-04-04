@@ -23,6 +23,13 @@ jobs:
       - name: Run TruffleHog Secret Scanning
         run: trufflehog --regex --entropy=True --max_depth=50 .
       
+      - name: Set up JDK and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      
       - name: Dependency Scan
         uses: snyk/actions/node@master
         env:
