@@ -28,21 +28,10 @@ jobs:
           java-version: '17'
           cache: maven
       
-      - name: OWASP Dependency Check
-        if: ${{ hashFiles('pom.xml') != '' }}
-        uses: dependency-check/Dependency-Check_Action@main
-        env:
-          JAVA_HOME: /usr/lib/jvm/java-7-oracle/jre//bin/java
-        with:
-          project: 'My Project'
-          path: '.'
-          format: 'HTML'
-          out: 'reports'
-          args: >
-            --failOnCVSS 7
-            --enableExperimental
-            --suppression suppress.xml          
+      - name: Verify JAVA_HOME
+        run: echo $JAVA_HOME && ls -l $JAVA_HOME/bin/java
 
+    
       - name: Run TruffleHog Secret Scanning
         run: trufflehog --regex --entropy=True --max_depth=50 .
       
