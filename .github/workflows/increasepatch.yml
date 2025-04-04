@@ -12,15 +12,16 @@ jobs:
     outputs:
       output_tag: ${{ steps.version.outputs.version }}
     steps:
+      - name: Install TruffleHog
+        run: pip install truffleHog
+        
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Secret Scanning
-        uses: trufflesecurity/trufflehog@v3
-        with:
-          base: origin/main
-          head: HEAD
+
+      - name: Run TruffleHog Secret Scanning
+        run: trufflehog --regex --entropy=True --max_depth=50 .
 
       - name: Get latest tag
         id: get_tag
