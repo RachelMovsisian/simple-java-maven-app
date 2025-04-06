@@ -89,6 +89,7 @@ jobs:
 
       - name: Sign Docker Image
         run: |
+          cosign generate-key-pair
           cosign sign --key cosign.key ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
 
       - name: Verify Docker Image Signature
