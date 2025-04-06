@@ -80,3 +80,17 @@ jobs:
           tags: |
             ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
           build-args: VER=${{ steps.version.outputs.version }}
+      
+      - name: Install Cosign
+        run: |
+          curl -Lo cosign https://github.com/sigstore/cosign/releases/download/v1.10.0/cosign-linux-amd64
+          chmod +x cosign
+          sudo mv cosign /usr/local/bin/
+
+      - name: Sign Docker Image
+        run: |
+          cosign sign --key cosign.key ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
+
+      - name: Verify Docker Image Signature
+        run: |
+          cosign verify --key cosign.pub ghcr.io/rachelmovsisian/my-app:${{ steps.version.outputs.version }}
