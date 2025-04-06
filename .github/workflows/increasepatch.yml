@@ -58,9 +58,9 @@ jobs:
       - name: Scan Dockerfile for Security Issues
         id: scan_dockerfile
         run: |
-          docker run --rm -v $(pwd):/mnt hadolint/hadolint /mnt/Dockerfile
+          docker run --rm -v $(pwd):/mnt hadolint/hadolint hadolint /mnt/Dockerfile
 
-        continue-on-error: true
+        #continue-on-error: true
         
       - name: Build and Push Docker Image
         if: steps.scan_dockerfile.outcome == 'success'
