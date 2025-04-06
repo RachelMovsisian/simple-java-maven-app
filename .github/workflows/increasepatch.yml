@@ -54,8 +54,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      
+      - name: Scan Dockerfile for Security Issues
+        id: scan_dockerfile
+        run: |
+          docker run --rm -v $(pwd):/mnt/ haddolint/hadolint /mnt/Dockerfile
+        continue-on-error: true
+        
       - name: Build and Push Docker Image
+        if: steps.scan_dockerfile.outcome == 'success'
         uses: docker/build-push-action@v5
         with:
           context: .
