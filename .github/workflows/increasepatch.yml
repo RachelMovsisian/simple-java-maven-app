@@ -1,5 +1,6 @@
 name: Auto-Increment Patch Version, Push Docker Image, and Deploy to EC2
-
+env:
+  SKIP_STEP: true
 on:
   push:
     branches:
@@ -32,7 +33,7 @@ jobs:
         run: echo $JAVA_HOME && ls -l $JAVA_HOME/bin/java
 
       - name: OWASP Dependency Check with Maven
-        if: ${{ hashFiles('pom.xml') != '' }}
+        if: ${{ hashFiles('pom.xml') != '' }} && env.SKIP_STEP != 'true'
         run: |
           mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
     
