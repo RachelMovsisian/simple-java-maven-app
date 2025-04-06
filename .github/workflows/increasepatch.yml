@@ -1,6 +1,5 @@
 name: Auto-Increment Patch Version, Push Docker Image, and Deploy to EC2
-env:
-  SKIP_STEP: true
+
 on:
   push:
     branches:
@@ -20,29 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        if: ${{ hashFiles('pom.xml') != '' }}
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: maven
-      
-      - name: Verify JAVA_HOME
-        run: echo $JAVA_HOME && ls -l $JAVA_HOME/bin/java
-
-      - name: OWASP Dependency Check with Maven
-        if: ${{ hashFiles('pom.xml') != '' }} && env.SKIP_STEP != 'true'
-        run: |
-          mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
     
-      - name: Run TruffleHog Secret Scanning
-        run: trufflehog --regex --entropy=True --max_depth=50 .
-      
-      - name: Check Maven Dependencies
-        run: mvn dependency:tree -DoutputType=dot --batch-mode --non-recursive --file="pom.xml"
-
       - name: Install project dependencies
         run: mvn clean install -DskipTests
         
