@@ -7,6 +7,17 @@ on:
   workflow_dispatch:
 
 jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
+        
   release:
     runs-on: ubuntu-latest
     outputs:
